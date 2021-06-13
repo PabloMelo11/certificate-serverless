@@ -27,6 +27,10 @@ provider:
   iamRoleStatements:
     - Effect: Allow
       Actions:
+        - dynamodb:*
+      Resource: "*"
+    - Effect: Allow
+      Actions:
         - s3:*
       Resource: "*"
 
@@ -38,6 +42,12 @@ functions:
           path: /generateCertificate
           method: POST
           cors: true
+    iamRoleStatements:
+      - Effect:
+        Action:
+          - dynamodb:Query
+          - dynamodb:PutItem
+        Resource: "arn:aws:dynamodb:${self.provider,region}:*:table/users_certificates"
   verifyCertificate:
     handler: src/functions/verifyCertificate.handle
     events:
@@ -45,6 +55,11 @@ functions:
           path: /verifyCertificate/${id}
           method: GET
           cors: true
+    iamRoleStatements:
+    - Effect:
+      Action:
+        - dynamodb:Query
+      Resource: "arn:aws:dynamodb:${self.provider,region}:*:table/users_certificates"
 
 resources:
   Resources:
